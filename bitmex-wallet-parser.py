@@ -43,10 +43,12 @@ import argparse
 
 # Args  
 parser = argparse.ArgumentParser()
+parser.add_argument('--dateformat', choices=[ 'UK','US'], type=str, help='your system date format, options: [UK,US]', required=True)
 parser.add_argument('--hide-wallet', action='store_true', help='hide wallet / transaction date')
 parser.add_argument('--hide-affiliate', action='store_true', help='hide affiliate data')
 parser.add_argument('--hide-trading', action='store_true', help='hide trading data')
 parser.add_argument('--private', action='store_true', help='hide numerical values')
+
 args = parser.parse_args()
 
 total_plots = 3
@@ -91,12 +93,14 @@ df = pd.read_csv(wallet_file, infer_datetime_format=True)
 mask = (df['transactStatus'] != 'Canceled') & (df['transactType'] != 'UnrealisedPNL')
 df = df[mask]
 
-# Commented out because now using infer_datetime_format=True at the read_csv level 
 # transactiontime to datetime
-# UK
-# df['transactTime'] = pd.to_datetime( df['transactTime'], format='%d/%m/%Y, %H:%M:%S' )
-# US users
-# df['transactTime'] = pd.to_datetime( df['transactTime'], format='%d/%m/%Y, %I:%M:%S %p' )
+if args.dateformat == 'UK':
+	df['transactTime'] = pd.to_datetime( df['transactTime'], format='%d/%m/%Y, %H:%M:%S' )
+elif args.dateformat == 'US':
+	df['transactTime'] = pd.to_datetime( df['transactTime'], format='%d/%m/%Y, %I:%M:%S %p' )
+else:
+	logging.warning('Error, invalid date format, strftime not yet coded in for format')
+	exit()
 
 # Set it to be the index
 df.set_index(df['transactTime'], inplace=True)
@@ -245,7 +249,7 @@ if args.hide_trading != True:
 	else:
 		ax3.set_ylabel('BTC')
 
-	mask = (df['transactType'] == 'RealisedPNL')
+	mask = (df['transactType'] == ('RealisedPNL' or 'CashRebalance'))
 	ax3.plot( df[mask].index.values, df[mask]['amount'].values.cumsum()/100000000, color='b') 
 	ax3.fmt_xdata = mdates.DateFormatter('%d/%m/%Y')
 
@@ -277,3 +281,4 @@ plt.savefig(saved_plot_filename, bbox_inches='tight')
 
 pprint(wallet_file)
 pprint(df.head(4))
+pprint(df.tail(4))

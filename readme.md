@@ -18,11 +18,22 @@ The options are as follows:
 | Argument | Description | 
 | -------- | ----------- |
 | `-h, --help` | show this help message and exit |
+| `--dateformat` | Options 'UK' or 'US' - Since the csv is created clientside, you need to specify your date format'. | 
 | `--hide-wallet` | hide wallet / transaction data |
 | `--hide-affiliate` | hide affiliate data | 
 | `--hide-trading` | hide trading data | 
 | `--private` | hide numerical values | 
 
+
+### Date format
+- The `--dateformat=".."` is required because the Wallet History file is created clientside by javascript. So your date format might be different.  
+
+| Date Formats | Description |   
+| UK format | generated would be: `%d/%m/%Y, %H:%M:%S` |  
+| US format | generated would be like: `%d/%m/%Y, %I:%M:%S %p` |  
+  
+ You can check and code in your own date format by checking your csv file and referencing on [http://strftime.org/](http://strftime.org/)  
+   
 
 ### Single Chart Examples  
 
