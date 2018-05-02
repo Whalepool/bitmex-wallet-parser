@@ -84,15 +84,19 @@ wallet_file = files[len(files)-1]
 
 
 # Parse wallet file to dataframe
-df = pd.read_csv(wallet_file)
+df = pd.read_csv(wallet_file, infer_datetime_format=True)
 
 # Remove cancelled transactions
 # Remnove current unrealised P&L
 mask = (df['transactStatus'] != 'Canceled') & (df['transactType'] != 'UnrealisedPNL')
 df = df[mask]
 
+# Commented out because now using infer_datetime_format=True at the read_csv level 
 # transactiontime to datetime
-df['transactTime'] = pd.to_datetime( df['transactTime'], format='%d/%m/%Y, %H:%M:%S' )
+# UK
+# df['transactTime'] = pd.to_datetime( df['transactTime'], format='%d/%m/%Y, %H:%M:%S' )
+# US users
+# df['transactTime'] = pd.to_datetime( df['transactTime'], format='%d/%m/%Y, %I:%M:%S %p' )
 
 # Set it to be the index
 df.set_index(df['transactTime'], inplace=True)
