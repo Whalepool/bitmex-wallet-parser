@@ -13,7 +13,8 @@ Please be sure to just use the [bitmex whalepool affiliate link - http://bitmex.
 
 ### Options & Arguments
 You can enter various arguments to tailer the chart that is output. 
-The options are as follows:
+The options are as follows:  
+
 | Argument | Description | 
 | -------- | ----------- |
 | `-h, --help` | show this help message and exit |
