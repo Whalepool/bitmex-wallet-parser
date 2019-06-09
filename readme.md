@@ -67,7 +67,27 @@ python bitmex-wallet-parser.py --hide-trading  --show-affiliate --showmoney
   
 
 ### Sample output    
-![Sample output ](https://i.imgur.com/k5fO7EX.png)    
+Terminal output  
+![Sample output ](https://i.imgur.com/k5fO7EX.png)      
+  
+---   
+
+```bash 
+python bitmex-wallet-parser.py --hide-trading  --show-affiliate -s '2018-01-01 00:00' -e '2019-01-01 00:00'
+```  
+![chart example 1](https://i.imgur.com/RAyqesL.png)   
+  
+---   
+   
+  
+```bash
+python bitmex-wallet-parser.py -s '2019-01-01 00:00' -e '2019-06-09 00:00'
+```   
+![chart example 1](https://i.imgur.com/FM73DDz.png)   
+  
+---   
+   
+
    
 # TODO 
 cache/save/check cache/refresh latest data for trading history / candles   
