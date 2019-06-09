@@ -38,50 +38,9 @@ The options are as follows:
 
 | Argument | Description |
 | -------- | ----------- |
-| `-h, --help` | show this help message and exit |
-| `--hide-wallet` | hide wallet / transaction data |
-| `--hide-affiliate` | hide affiliate data |
+| `-s` | start date, eg '2019-01-01 00:00' |
+| `-e` | end date, eg '2019-02-01 00:00' |
+| `--show-wallet` | show full wallet balance history including deposit/withdrawals |
+| `--show-affiliate` | show affiliate income |
 | `--hide-trading` | hide trading data |
-| `--private` | hide numerical values |
-
-
-
-### Single Chart Examples
-
-- Transaction history  -
-	`python3.6 bitmex-wallet-parser.py --hide-affiliate --hide-trading`
-
-- Affiliate income  -
-	`python3.6 bitmex-wallet-parser.py --hide-wallet --hide-trading`
-
-- Trading performance  -
-	`python3.6 bitmex-wallet-parser.py --hide-wallet --hide-affiliate`
-
-Add the `--private` flag on any command to remove values for more privacy when sharing your charts.
-
-------
-
-### Two Chart Examples
-
-- Transaction history + Affiliate Income  -
-	`python3.6 bitmex-wallet-parser.py --hide-trading`
-
-- Transaction history + Trading performance  -
-	`python3.6 bitmex-wallet-parser.py --hide-affiliate`
-
-- Affiliate income + Trading performance  -
-	`python3.6 bitmex-wallet-parser.py --hide-wallet`
-
-Add the `--private` flag on any command to remove values for more privacy when sharing your charts.
-
-
-------
-
-### Three Chart Example
-
-By default the script will produce 3 charts on the one image summarising your transaction + affiliate + trading performance
-
-`python3.6 bitmex-wallet-parser.py`
-
-
-For more info join [@whalepoolbtc](https://t.me/whalepoolbtc) on telegram
+| `--showmoney` | add money values to the axis |
