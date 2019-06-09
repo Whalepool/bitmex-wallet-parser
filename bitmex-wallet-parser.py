@@ -268,7 +268,7 @@ if args.hide_trading != True:
 fig.autofmt_xdate()
 
 # Save figure 
-saved_plot_filename = datetime.today().strftime('%Y-%m-%d-%H:%M:%S')+'.png'
+saved_plot_filename = datetime.today().strftime('%Y-%m-%d-%H-%M-%S')+'.png'
 plt.savefig(saved_plot_filename, bbox_inches='tight')
 
 

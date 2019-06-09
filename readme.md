@@ -8,7 +8,10 @@ Please be sure to just use the [bitmex whalepool affiliate link - http://bitmex.
 
 # Instructions
 - Install `python-devel` package on your machine
-- Install pip requirements `sudo pip install -r requirements.pip`
+- Install pip requirements:
+	- **Linux** `sudo pip install -r requirements.pip`
+	- **Windows** `py pip install -r requirements.pip`
+	
 - Go to [https://www.bitmex.com/app/wallet](https://www.bitmex.com/app/wallet) and click the 'save as CSV' on the top right.  - This will download 'Wallet History - YYYY-MM-DD.csv' file. Put this file in the same location as the python script.
 - run `python3.6 bitmex-wallet-parser.py` and then view the folder once complete, a chart will be saved there.
 
