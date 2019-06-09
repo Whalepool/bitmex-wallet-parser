@@ -276,7 +276,14 @@ plt.savefig(saved_plot_filename, bbox_inches='tight')
 ############################################################
 
 
-
-pprint(wallet_file)
-pprint(df.head(4))
-pprint(df.tail(4))
+print('\033[95m',"-------------------------------", '\033[0m')
+print('\033[92m',wallet_file,'\033[92m')
+print('\033[95m', "-------------------------------", '\033[0m')
+print('\033[93m', 'Candle df contents', '\033[0m')
+print(candle_df.head(4))
+print(candle_df.tail(4))
+print('\033[95m', "-------------------------------", '\033[0m')
+print('\033[93m', 'Wallet df contents', '\033[0m')
+print(df.head(4))
+print(df.tail(4))
+print('\033[95m', "-------------------------------", '\033[0m')

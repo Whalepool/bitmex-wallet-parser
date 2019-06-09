@@ -3,17 +3,20 @@
 ## About
 A simple script to parse over your bitmex wallet history file and give you an overview of your account.
 
-### Donations
-Please be sure to just use the [bitmex whalepool affiliate link - http://bitmex.whalepool.io](http://bitmex.whalepool.io) to support [whalepool](https://t.me/whalepoolbtc)
+### Support
+Please use the [bitmex whalepool affiliate link](http://bitmex.whalepool.io) or the [deribit whalepool affiliate link](http://derbit.whalepool.io) to support [@whalepool](https://t.me/whalepoolbtc)
 
-# Instructions
+# Install / Setup Instructions
 - Install `python-devel` package on your machine
 - Install pip requirements:
 	- **Linux** `sudo pip install -r requirements.pip`
 	- **Windows** `py pip install -r requirements.pip`
-	
+
 - Go to [https://www.bitmex.com/app/wallet](https://www.bitmex.com/app/wallet) and click the 'save as CSV' on the top right.  - This will download 'Wallet History - YYYY-MM-DD.csv' file. Put this file in the same location as the python script.
-- run `python3.6 bitmex-wallet-parser.py` and then view the folder once complete, a chart will be saved there.
+
+
+# Run some commands 
+Script will output a chart for each time you run it. Share and enjoy ! 
 
 ```bash
 # Simple trading returns, no balances present
@@ -35,9 +38,7 @@ python bitmex-wallet-parser.py --hide-trading  --show-affiliate --showmoney
 ```
 
 
-### Options & Arguments
-You can enter various arguments to tailer the chart that is output.
-The options are as follows:
+### Arguments
 
 | Argument | Description |
 | -------- | ----------- |
