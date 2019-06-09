@@ -1,8 +1,9 @@
 #!/usr/bin/env python3.6
 
 # Logging module
-import logging
-logging.basicConfig(level=logging.INFO)
+import coloredlogs, logging
+logger = logging.getLogger(__name__)
+coloredlogs.install(level='DEBUG', logger=logger)
 
 # Datetime 
 from datetime import datetime,  timedelta as datetime_timedelta
@@ -222,7 +223,7 @@ class BFX( Timeperiods ):
 
 			resolution_increment = self.api_timeframe_resample_mapping[ resolution ]
 
-			logging.info('Getting optimal subperiod, '+str(resolution_increment)+' end date.')
+			logger.info('Getting optimal subperiod, '+str(resolution_increment)+' end date.')
 
 			next_timeperiod = self.increment_timeperiods( end_date, 1 )
 			optimal_subperiod = self.increment_timeperiods( end_date, 1, resolution_increment )
@@ -243,7 +244,7 @@ class BFX( Timeperiods ):
 		start_date_ms = self.datetime_to_miliseconds(start_date)
 		end_date_ms = self.datetime_to_miliseconds(end_date)
 
-		logging.info( 'Api request candles from '+str(start_date)+' to '+str(end_date) )
+		logger.info( 'Api request candles from '+str(start_date)+' to '+str(end_date) )
 
 		# Base URL to be getting the candlestick data from
 		base_url     = 'https://api.bitfinex.com/v2/candles/trade:'+resolution_api+':t'+ticker+'/hist?limit='+str(limit)
@@ -263,8 +264,8 @@ class BFX( Timeperiods ):
 
 		candles = candles[0:cut_off]
 
-		logging.info( 'First candle returned: '+str( datetime.utcfromtimestamp(candles[0][0]/1000.0) )+', '+str(candles[0]) )
-		logging.info( 'Last candle returned: '+str( datetime.utcfromtimestamp(candles[len(candles)-1][0]/1000.0) )+', '+str(candles[len(candles)-1]) )
+		logger.info( 'First candle returned: '+str( datetime.utcfromtimestamp(candles[0][0]/1000.0) )+', '+str(candles[0]) )
+		logger.info( 'Last candle returned: '+str( datetime.utcfromtimestamp(candles[len(candles)-1][0]/1000.0) )+', '+str(candles[len(candles)-1]) )
 
 		last_date_ms = candles[len(candles)-1][0]
 
@@ -281,8 +282,8 @@ class BFX( Timeperiods ):
 
 			candles       = candles[0:len(candles)-1] + api_candles[0:cut_off+1]
 
-			print('First candle returned: '+str( datetime.utcfromtimestamp(api_candles[0][0]/1000.0) )+', '+str(api_candles[0]) )
-			print( 'Last candle used: '+str( datetime.utcfromtimestamp(api_candles[cut_off][0]/1000.0) )+', '+str(api_candles[cut_off]) )
+			logger.info('First candle returned: '+str( datetime.utcfromtimestamp(api_candles[0][0]/1000.0) )+', '+str(api_candles[0]) )
+			logger.info( 'Last candle used: '+str( datetime.utcfromtimestamp(api_candles[cut_off][0]/1000.0) )+', '+str(api_candles[cut_off]) )
 
 			last_date_ms = candles[len(candles)-1][0]
 
@@ -302,16 +303,16 @@ class BFX( Timeperiods ):
 
 				if candles[i+1][0] != expected_nxt_ms:
 
-					logging.warn('Api returned missing candles, at '+str(candle[0])+', expected '+str(expected_nxt_ms)+', got '+str(candles[i+1][0]) )
-					logging.warn('at: '+str( datetime.utcfromtimestamp(candle[0]/1000.0) ))
-					logging.warn('expected_nxt_ms: '+str( datetime.utcfromtimestamp(expected_nxt_ms/1000.0) ))
-					logging.warn('got: '+str( datetime.utcfromtimestamp(candles[i+1][0]/1000.0) ))
+					logger.warning('Api returned missing candles, at '+str(candle[0])+', expected '+str(expected_nxt_ms)+', got '+str(candles[i+1][0]) )
+					logger.warning('at: '+str( datetime.utcfromtimestamp(candle[0]/1000.0) ))
+					logger.warning('expected_nxt_ms: '+str( datetime.utcfromtimestamp(expected_nxt_ms/1000.0) ))
+					logger.warning('got: '+str( datetime.utcfromtimestamp(candles[i+1][0]/1000.0) ))
 
 					done = False
 					while done == False:
 
 						fake_candle = [ expected_nxt_ms, candle[2], candle[2], candle[2], candle[2], 0 ]
-						error('Caution: Adding fake candle '+str( datetime.utcfromtimestamp(expected_nxt_ms/1000.0) )+' '+str(fake_candle))
+						logger.warning('Caution: Adding fake candle '+str( datetime.utcfromtimestamp(expected_nxt_ms/1000.0) )+' '+str(fake_candle))
 						c = self.candles_map_api_to_list( fake_candle )
 						output.append(c)
 
@@ -346,10 +347,10 @@ class BFX( Timeperiods ):
 
 		if (self.api_limit_seconds > 0): 
 
-			logging.info('Slow api mode, sleeping for '+str(self.api_limit_seconds)+' seconds')
+			logger.info('Slow api mode, sleeping for '+str(self.api_limit_seconds)+' seconds')
 			time.sleep(self.api_limit_seconds)
 
-		logging.info( 'Requesting: '+url ) 
+		logger.info( 'Requesting: '+url ) 
 
 		response = requests_get(url).text
 		data     = json_loads(response)

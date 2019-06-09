@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 20*
 Wallet*
+config.json

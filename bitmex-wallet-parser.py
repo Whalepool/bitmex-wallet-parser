@@ -1,8 +1,9 @@
 #!/usr/bin/env python3.6
 
-# Logging module
-import logging
-logging.basicConfig(level=logging.INFO)
+# logger module
+import coloredlogs, logging
+logger = logging.getLogger(__name__)
+coloredlogs.install(level='DEBUG', logger=logger)
 
 # Finding files
 import glob
@@ -52,6 +53,7 @@ parser.add_argument('--show-wallet', action='store_true', help='hide wallet / tr
 parser.add_argument('--show-affiliate', action='store_true', help='hide affiliate data')
 parser.add_argument('--hide-trading', action='store_true', help='hide trading data')
 parser.add_argument('--showmoney', action='store_true', help='hide numerical values')
+parser.add_argument('--use-api', action='store_true', help='Fetch historical trading data via bitmex api')
 
 args = parser.parse_args()
 start_datetime = args.start_datetime
@@ -67,23 +69,99 @@ if args.hide_trading   == True:
 	total_plots -= 1
 
 if total_plots == 0:
-	logging.warning('All available plots set to hidden. nothing to show')
+	logger.warning('All available plots set to hidden. nothing to show')
 	exit()
 
 
 ############################################################
 
 
-# Get the downloaded bitmex wallet files
-files = sorted(glob.glob('Wallet*'))
+if args.use_api == True:
+	
+	# pip install bitmex - https://github.com/BitMEX/api-connectors/tree/master/official-http/python-swaggerpy
+	import bitmex
+	import csv
+	from pathlib import Path
 
-if len(files) == 0:
-	logging.warning('No valid bitmex wallet files found.')
-	exit()
+	bitmex_api_key    = None
+	bitmex_api_secret = None 
 
 
-# Get the latest most up to date wallet file
-wallet_file = files[len(files)-1]
+	confg_file = Path("config.json")
+	if confg_file.is_file():
+		with open(confg_file, 'r') as file:
+			data = file.read()
+			obj  =  json_loads(data)
+
+			if 'bitmex_api_key' not in obj:
+				logger.critical('config.json missing bitmex_api_key')
+				exit()
+
+			elif 'bitmex_api_secret' not in obj:
+				logger.critical('config.json missing bitmex_api_secret')
+				exit()
+
+			else:
+				bitmex_api_key = obj['bitmex_api_key']
+				bitmex_api_secret = obj['bitmex_api_secret']
+
+
+	if (bitmex_api_key == None) or (bitmex_api_secret == None):
+
+		print('\033[95m',"-------------------------------", '\033[0m')
+		print('\033[92m','--use-api is set to True \n','\033[0m')
+		print('You do not have your bitmex api keys stored in config.json. You can enter them here.')
+		print('If you do not have an api key one can be obtained from: https://www.bitmex.com/app/apiKeys \n')
+		print('These keys will not be saved to config.json, you must do that manually as saving api keys in plain text is an important security consideration.\n')
+
+		bitmex_api_key    = input("Enter you Bitmex API Key: ")
+		bitmex_api_secret = input("Enter you Bitmex API Secret: ")
+
+	wallet_file  = "Wallet-History-from-api.csv"
+	client 	     = bitmex.bitmex(test=False, api_key=bitmex_api_key,api_secret=bitmex_api_secret)
+	data         = client.User.User_getWalletHistory(count=5000000).result()
+
+	fieldnames = [
+	    	'transactTime',
+	    	'transactType',
+	    	'amount',
+	    	'fee',
+	    	'address',
+	    	'transactStatus',
+	    	'walletBalance'
+	    ]
+	with open(wallet_file, "w", newline='') as f:
+	    writer = csv.DictWriter(f, fieldnames=fieldnames)
+	    writer.writerow({
+			'transactTime'  : 'transactTime',
+			'transactType'  : 'transactType',
+			'amount' 	    : 'amount',
+			'fee'		    : 'fee',
+			'address' 	    : 'address',
+			'transactStatus': 'transactStatus',
+			'walletBalance' : 'walletBalance'
+		})
+	    for x in data[0]:
+	        t = {}
+	        for field in fieldnames:
+	        	if field == 'transactTime':
+	        		t[field] = x[field].strftime('%Y-%m-%d %H:%M:%S.%f')
+	        	else:
+	        		t[field] = x[field] 
+
+	        logger.info('Writing row: '+str(t))
+	        writer.writerow(t)
+
+else : 
+	# Get the downloaded bitmex wallet files
+	files = sorted(glob.glob('Wallet*'))
+
+	if len(files) == 0:
+		logger.warning('No valid bitmex wallet files found.')
+		exit()
+
+	# Get the latest most up to date wallet file
+	wallet_file = files[len(files)-1]
 
 ############################################################
 
@@ -130,7 +208,7 @@ now = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 if (end_datetime == None) or (end_datetime > now): 
 	end_datetime = now 
 
-logging.info('Querying candles between: '+str(start_datetime)+' and '+str(end_datetime))
+logger.info('Querying candles between: '+str(start_datetime)+' and '+str(end_datetime))
 
 candles   = finex.api_request_candles( '1D', 'BTCUSD', start_datetime, end_datetime )
 
@@ -277,7 +355,7 @@ plt.savefig(saved_plot_filename, bbox_inches='tight')
 
 
 print('\033[95m',"-------------------------------", '\033[0m')
-print('\033[92m',wallet_file,'\033[92m')
+print('\033[92m',wallet_file,'\033[0m')
 print('\033[95m', "-------------------------------", '\033[0m')
 print('\033[93m', 'Candle df contents', '\033[0m')
 print(candle_df.head(4))
