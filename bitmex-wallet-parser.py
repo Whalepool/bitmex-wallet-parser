@@ -48,21 +48,21 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('-s', '--start_datetime', help='Start date', default=None, type=(lambda s: datetime.strptime(s, '%Y-%m-%d %H:%M')) )
 parser.add_argument('-e', '--end_datetime', help='End date', default=None, type=(lambda s: datetime.strptime(s, '%Y-%m-%d %H:%M')) )
-parser.add_argument('--hide-wallet', action='store_true', default=True, help='hide wallet / transaction date')
-parser.add_argument('--hide-affiliate', action='store_true', default=True, help='hide affiliate data')
+parser.add_argument('--show-wallet', action='store_true', help='hide wallet / transaction date')
+parser.add_argument('--show-affiliate', action='store_true', help='hide affiliate data')
 parser.add_argument('--hide-trading', action='store_true', help='hide trading data')
-parser.add_argument('--private', action='store_true', default=True, help='hide numerical values')
+parser.add_argument('--showmoney', action='store_true', help='hide numerical values')
 
 args = parser.parse_args()
 start_datetime = args.start_datetime
 end_datetime   = args.end_datetime
 
-total_plots = 3
+total_plots = 1
 
-if args.hide_wallet    == True:
-	total_plots -= 1
-if args.hide_affiliate == True:
-	total_plots -= 1
+if args.show_wallet    == True:
+	total_plots += 1
+if args.show_affiliate == True:
+	total_plots += 1
 if args.hide_trading   == True:
 	total_plots -= 1
 
@@ -148,7 +148,7 @@ candle_df = candle_df[~candle_df.index.duplicated(keep='last')]
 
 
 # Begin plot
-fig = plt.figure(facecolor='white', figsize=(12, 8), dpi=100)
+fig = plt.figure(facecolor='white', figsize=(15, 11), dpi=100)
 fig.suptitle('Bitmex Account History & Performance')
 
 on_plot = 1
@@ -156,7 +156,7 @@ on_plot = 1
 """
 Wallet / Transaction History
 """
-if args.hide_wallet != True:
+if args.show_wallet == True:
 
 	ax1 = plt.subplot(total_plots,1,on_plot)
 	on_plot += 1
@@ -164,10 +164,10 @@ if args.hide_wallet != True:
 	ax1.set_title('Transaction History')
 
 	# If flagged private, hide btc values
-	if args.private == True:
-		ax1.get_yaxis().set_ticks([])
-	else:
+	if args.showmoney == True:
 		ax1.set_ylabel('BTC')
+	else:
+		ax1.get_yaxis().set_ticks([])
 
 	ax1.plot( df.index.values, df['amount'].values.cumsum()/100000000, color='b') 
 	ax1.fmt_xdata = mdates.DateFormatter('%d/%m/%Y')
@@ -175,7 +175,7 @@ if args.hide_wallet != True:
 
 	# Add bitcoin price 
 	ax11 = ax1.twinx()
-	ax11.set_yscale('log')
+	# ax11.set_yscale('log')
 	ax11.fill_between(candle_df.index.values, candle_df['low'].min(), candle_df['close'].values, facecolor='blue', alpha=0.2)
 	ax11.yaxis.set_major_formatter(ScalarFormatter())
 
@@ -199,7 +199,7 @@ if args.hide_wallet != True:
 """
 Affiliate Income
 """
-if args.hide_affiliate != True:
+if args.show_affiliate == True:
 
 	ax2 = plt.subplot(total_plots,1,on_plot)
 	on_plot += 1
@@ -207,10 +207,10 @@ if args.hide_affiliate != True:
 	ax2.set_title('Affiliate income')
 
 	# If flagged private, hide btc values
-	if args.private == True:
-		ax2.get_yaxis().set_ticks([])
-	else:
+	if args.showmoney == True:
 		ax2.set_ylabel('BTC')
+	else:
+		ax2.get_yaxis().set_ticks([])
 
 	mask = (df['transactType'] == 'AffiliatePayout')
 	ax2.plot( df[mask].index.values, df[mask]['amount'].values.cumsum()/100000000, color='b') 
@@ -219,7 +219,7 @@ if args.hide_affiliate != True:
 
 	# Add bitcoin price 
 	ax22 = ax2.twinx()
-	ax22.set_yscale('log')
+	# ax22.set_yscale('log')
 	ax22.fill_between(candle_df.index.values, candle_df['low'].min(), candle_df['close'].values, facecolor='blue', alpha=0.2)
 	ax22.yaxis.set_major_formatter(ScalarFormatter())
 
@@ -235,10 +235,10 @@ if args.hide_trading != True:
 	ax3.set_title('Trading Returns')
 
 	# If flagged private, hide btc values
-	if args.private == True:
-		ax3.get_yaxis().set_ticks([])
-	else:
+	if args.showmoney== True:
 		ax3.set_ylabel('BTC')
+	else:
+		ax3.get_yaxis().set_ticks([])
 
 	mask = (df['transactType'] == ('RealisedPNL' or 'CashRebalance'))
 	line = ax3.plot( df[mask].index.values, df[mask]['amount'].values.cumsum()/100000000, color='red', label='Performance') 

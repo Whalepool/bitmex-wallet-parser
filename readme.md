@@ -12,6 +12,26 @@ Please be sure to just use the [bitmex whalepool affiliate link - http://bitmex.
 - Go to [https://www.bitmex.com/app/wallet](https://www.bitmex.com/app/wallet) and click the 'save as CSV' on the top right.  - This will download 'Wallet History - YYYY-MM-DD.csv' file. Put this file in the same location as the python script.
 - run `python3.6 bitmex-wallet-parser.py` and then view the folder once complete, a chart will be saved there.
 
+```bash
+# Simple trading returns, no balances present
+python bitmex-wallet-parser.py
+# Show balances
+python bitmex-wallet-parser.py --showmoney
+
+# Show your wallet aswell, so u can see deposit/withdrawals from your account
+python bitmex-wallet-parser.py --show-wallet
+
+# Show your affiliate balances
+python bitmex-wallet-parser.py --show-affiliate
+
+# Hide your trading performance
+# Maybe just to show affiliate balances and nothing else ? 
+python bitmex-wallet-parser.py --hide-trading 
+python bitmex-wallet-parser.py --hide-trading  --show-affiliate
+python bitmex-wallet-parser.py --hide-trading  --show-affiliate --showmoney
+```
+
+
 ### Options & Arguments
 You can enter various arguments to tailer the chart that is output.
 The options are as follows:
