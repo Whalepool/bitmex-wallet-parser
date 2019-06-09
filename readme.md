@@ -7,7 +7,8 @@ A simple script to parse over your bitmex wallet history file and give you an ov
 Please be sure to just use the [bitmex whalepool affiliate link - http://bitmex.whalepool.io](http://bitmex.whalepool.io) to support [whalepool](https://t.me/whalepoolbtc)
 
 # Instructions 
-- Install pip requirements `sudo pip3.6 install -r requirements.pip`  
+- Install `python-devel` package on your machine
+- Install pip requirements `sudo pip install -r requirements.pip`  
 - Go to [https://www.bitmex.com/app/wallet](https://www.bitmex.com/app/wallet) and click the 'save as CSV' on the top right.  - This will download 'Wallet History - YYYY-MM-DD.csv' file. Put this file in the same location as the python script.
 - run `python3.6 bitmex-wallet-parser.py` and then view the folder once complete, a chart will be saved there. 
 
@@ -18,22 +19,11 @@ The options are as follows:
 | Argument | Description | 
 | -------- | ----------- |
 | `-h, --help` | show this help message and exit |
-| `--dateformat` | Options 'UK' or 'US' - Since the csv is created clientside, you need to specify your date format'. | 
 | `--hide-wallet` | hide wallet / transaction data |
 | `--hide-affiliate` | hide affiliate data | 
 | `--hide-trading` | hide trading data | 
 | `--private` | hide numerical values | 
 
-
-### Date format
-- The `--dateformat=".."` is required because the Wallet History file is created clientside by javascript. So your date format might be different.  
-
-| Date Formats | Description |   
-| ------------ | ----------- |  
-| UK format | generated would be: `%d/%m/%Y, %H:%M:%S` |  
-| US format | generated would be like: `%d/%m/%Y, %I:%M:%S %p` |  
-  
- You can check and code in your own date format by checking your csv file and referencing on [http://strftime.org/](http://strftime.org/)  
 
 
 ### Single Chart Examples  

@@ -12,6 +12,8 @@ from sys import exit
 
 # Datetime 
 from datetime import datetime,  timedelta as datetime_timedelta
+import dateutil.parser
+
 
 # dataframe
 import pandas as pd 
@@ -43,7 +45,6 @@ import argparse
 
 # Args  
 parser = argparse.ArgumentParser()
-parser.add_argument('--dateformat', choices=[ 'UK','US'], type=str, help='your system date format, options: [UK,US]', required=True)
 parser.add_argument('--hide-wallet', action='store_true', help='hide wallet / transaction date')
 parser.add_argument('--hide-affiliate', action='store_true', help='hide affiliate data')
 parser.add_argument('--hide-trading', action='store_true', help='hide trading data')
@@ -79,11 +80,7 @@ if len(files) == 0:
 # Get the latest most up to date wallet file
 wallet_file = files[len(files)-1]
 
-
-
 ############################################################
-
-
 
 # Parse wallet file to dataframe
 df = pd.read_csv(wallet_file, infer_datetime_format=True)
@@ -94,13 +91,8 @@ mask = (df['transactStatus'] != 'Canceled') & (df['transactType'] != 'Unrealised
 df = df[mask]
 
 # transactiontime to datetime
-if args.dateformat == 'UK':
-	df['transactTime'] = pd.to_datetime( df['transactTime'], format='%d/%m/%Y, %H:%M:%S' )
-elif args.dateformat == 'US':
-	df['transactTime'] = pd.to_datetime( df['transactTime'], format='%d/%m/%Y, %I:%M:%S %p' )
-else:
-	logging.warning('Error, invalid date format, strftime not yet coded in for format')
-	exit()
+df['transactTime'] = df['transactTime'].apply(dateutil.parser.parse)
+
 
 # Set it to be the index
 df.set_index(df['transactTime'], inplace=True)
@@ -253,12 +245,12 @@ if args.hide_trading != True:
 	ax3.plot( df[mask].index.values, df[mask]['amount'].values.cumsum()/100000000, color='b') 
 	ax3.fmt_xdata = mdates.DateFormatter('%d/%m/%Y')
 
-
+	ax3.get_xaxis().set_visible(False)
 	# Add bitcoin price 
-	ax33 = ax3.twinx()
-	ax33.set_yscale('log')
-	ax33.fill_between(candle_df.index.values, candle_df['low'].min(), candle_df['close'].values, facecolor='blue', alpha=0.2)
-	ax33.yaxis.set_major_formatter(ScalarFormatter())
+	# ax33 = ax3.twinx()
+	# ax33.set_yscale('log')
+	# ax33.fill_between(candle_df.index.values, candle_df['low'].min(), candle_df['close'].values, facecolor='blue', alpha=0.2)
+	# ax33.yaxis.set_major_formatter(ScalarFormatter())
 
 
 
