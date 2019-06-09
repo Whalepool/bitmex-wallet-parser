@@ -27,6 +27,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.patches import Circle
+import matplotlib.patches as mpatches
 from matplotlib.ticker import ScalarFormatter
 
 # # Loading/unloading json (for api requests)
@@ -45,12 +46,16 @@ import argparse
 
 # Args  
 parser = argparse.ArgumentParser()
-parser.add_argument('--hide-wallet', action='store_true', help='hide wallet / transaction date')
-parser.add_argument('--hide-affiliate', action='store_true', help='hide affiliate data')
+parser.add_argument('-s', '--start_datetime', help='Start date', default=None, type=(lambda s: datetime.strptime(s, '%Y-%m-%d %H:%M')) )
+parser.add_argument('-e', '--end_datetime', help='End date', default=None, type=(lambda s: datetime.strptime(s, '%Y-%m-%d %H:%M')) )
+parser.add_argument('--hide-wallet', action='store_true', default=True, help='hide wallet / transaction date')
+parser.add_argument('--hide-affiliate', action='store_true', default=True, help='hide affiliate data')
 parser.add_argument('--hide-trading', action='store_true', help='hide trading data')
-parser.add_argument('--private', action='store_true', help='hide numerical values')
+parser.add_argument('--private', action='store_true', default=True, help='hide numerical values')
 
 args = parser.parse_args()
+start_datetime = args.start_datetime
+end_datetime   = args.end_datetime
 
 total_plots = 3
 
@@ -117,31 +122,25 @@ Get some bitcoin price data
 """
 finex = BFX()
 
-start_datetime = pd.to_datetime(df.index.values[0]).to_pydatetime() 
-end_datetime   = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) 
+if start_datetime == None:
+	start_datetime = pd.to_datetime(df.index.values[0]).to_pydatetime() 
 
-candles_json   = finex.api_request_candles( '1D', start_datetime )
-last_returned_from_api  = datetime.utcfromtimestamp(candles_json[len(candles_json)-1][0]/1000.0)
+now = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) 
 
+if (end_datetime == None) or (end_datetime > now): 
+	end_datetime = now 
 
-while last_returned_from_api < end_datetime:
+logging.info('Querying candles between: '+str(start_datetime)+' and '+str(end_datetime))
 
-	# New api start date = the last returned date + 1 period 
-	new_api_start_date = last_returned_from_api+datetime_timedelta(seconds=86400)
-
-	# Fetch from the api
-	candles_json += finex.api_request_candles( '1D', new_api_start_date )
-	last_returned_from_api  = datetime.utcfromtimestamp(candles_json[len(candles_json)-1][0]/1000.0)
+candles   = finex.api_request_candles( '1D', 'BTCUSD', start_datetime, end_datetime )
 
 
 # Format into a nice df 
-candle_df = pd.read_json(json_dumps(candles_json))
-candle_df.rename(columns={0:'date', 1:'open', 2:'close', 3:'high', 4:'low', 5:'volume'}, inplace=True)
-candle_df['date'] = pd.to_datetime( candle_df['date'], unit='ms' )
-candle_df.set_index(candle_df['date'], inplace=True)
+candle_df = pd.DataFrame.from_dict( candles )
+candle_df.set_index(candle_df['timestamp'], inplace=True)
+candle_df.drop(['timestamp'], axis=1, inplace=True)
 candle_df.sort_index(inplace=True)
-del candle_df['date']
-
+candle_df = candle_df[~candle_df.index.duplicated(keep='last')]
 
 
 ############################################################
@@ -242,16 +241,23 @@ if args.hide_trading != True:
 		ax3.set_ylabel('BTC')
 
 	mask = (df['transactType'] == ('RealisedPNL' or 'CashRebalance'))
-	ax3.plot( df[mask].index.values, df[mask]['amount'].values.cumsum()/100000000, color='b') 
+	line = ax3.plot( df[mask].index.values, df[mask]['amount'].values.cumsum()/100000000, color='red', label='Performance') 
 	ax3.fmt_xdata = mdates.DateFormatter('%d/%m/%Y')
 
-	ax3.get_xaxis().set_visible(False)
-	# Add bitcoin price 
-	# ax33 = ax3.twinx()
-	# ax33.set_yscale('log')
-	# ax33.fill_between(candle_df.index.values, candle_df['low'].min(), candle_df['close'].values, facecolor='blue', alpha=0.2)
-	# ax33.yaxis.set_major_formatter(ScalarFormatter())
+	ax3.get_xaxis().set_visible(True)
 
+	start = df[mask].index[0]
+	candle_df = candle_df[start:]
+
+	# Add bitcoin price 
+	ax33 = ax3.twinx()
+	# ax33.set_yscale('log')
+	area = ax33.fill_between(candle_df.index.values, candle_df['low'].min(), candle_df['close'].values, facecolor='blue', alpha=0.2, label='BTCUSD Price')
+	ax33.yaxis.set_major_formatter(ScalarFormatter())
+
+	red_patch = mpatches.Patch(color='red', label='Trading Returns')
+	blue_patch = mpatches.Patch(color='blue', label='BTCUSD Price')
+	ax3.legend(handles=[red_patch, blue_patch])
 
 
 ############################################################
