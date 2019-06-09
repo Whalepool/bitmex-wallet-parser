@@ -53,7 +53,7 @@ parser.add_argument('--show-wallet', action='store_true', help='hide wallet / tr
 parser.add_argument('--show-affiliate', action='store_true', help='hide affiliate data')
 parser.add_argument('--hide-trading', action='store_true', help='hide trading data')
 parser.add_argument('--showmoney', action='store_true', help='hide numerical values')
-parser.add_argument('--use-api', action='store_true', help='Fetch historical trading data via bitmex api')
+parser.add_argument('--with-api', action='store_true', help='Fetch historical trading data via bitmex api')
 
 args = parser.parse_args()
 start_datetime = args.start_datetime
@@ -76,7 +76,7 @@ if total_plots == 0:
 ############################################################
 
 
-if args.use_api == True:
+if args.with_api == True:
 	
 	# pip install bitmex - https://github.com/BitMEX/api-connectors/tree/master/official-http/python-swaggerpy
 	import bitmex
@@ -117,7 +117,9 @@ if args.use_api == True:
 		bitmex_api_key    = input("Enter you Bitmex API Key: ")
 		bitmex_api_secret = input("Enter you Bitmex API Secret: ")
 
-	wallet_file  = "Wallet-History-from-api.csv"
+	now = datetime.now().replace(second=0, microsecond=0)
+	wallet_file  = "Wallet History  "+now.strftime('%Y-%-m-%d %H-%M')+".csv"	 
+
 	client 	     = bitmex.bitmex(test=False, api_key=bitmex_api_key,api_secret=bitmex_api_secret)
 	data         = client.User.User_getWalletHistory(count=5000000).result()
 
@@ -152,16 +154,17 @@ if args.use_api == True:
 	        logger.info('Writing row: '+str(t))
 	        writer.writerow(t)
 
-else : 
-	# Get the downloaded bitmex wallet files
-	files = sorted(glob.glob('Wallet*'))
 
-	if len(files) == 0:
-		logger.warning('No valid bitmex wallet files found.')
-		exit()
 
-	# Get the latest most up to date wallet file
-	wallet_file = files[len(files)-1]
+# Get the list of availabble bitmex wallet files
+files = sorted(glob.glob('Wallet*'))
+
+if len(files) == 0:
+	logger.critical('No valid bitmex wallet files found.')
+	exit()
+
+# Get the latest most up to date wallet file
+wallet_file = files[len(files)-1]
 
 ############################################################
 
@@ -188,6 +191,8 @@ df['mpldate'] = df['transactTime'].map(mdates.date2num)
 
 # Delete the old transactTime column
 del df['transactTime']
+
+df = df[start_datetime:end_datetime]
 
 
 
@@ -219,6 +224,7 @@ candle_df.set_index(candle_df['timestamp'], inplace=True)
 candle_df.drop(['timestamp'], axis=1, inplace=True)
 candle_df.sort_index(inplace=True)
 candle_df = candle_df[~candle_df.index.duplicated(keep='last')]
+candle_df = candle_df[start_datetime:end_datetime]
 
 
 ############################################################
@@ -355,7 +361,7 @@ plt.savefig(saved_plot_filename, bbox_inches='tight')
 
 
 print('\033[95m',"-------------------------------", '\033[0m')
-print('\033[92m',wallet_file,'\033[0m')
+print('\033[92m','Using Wallet : '+wallet_file,'\033[0m')
 print('\033[95m', "-------------------------------", '\033[0m')
 print('\033[93m', 'Candle df contents', '\033[0m')
 print(candle_df.head(4))
@@ -365,3 +371,4 @@ print('\033[93m', 'Wallet df contents', '\033[0m')
 print(df.head(4))
 print(df.tail(4))
 print('\033[95m', "-------------------------------", '\033[0m')
+print('\033[96m','Saved chart to: '+saved_plot_filename+'\n', '\033[0m')

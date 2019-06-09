@@ -26,7 +26,7 @@ You don't have to, there is a prompt for the details if you dont have config.jso
 cp config.sample.json config.json  
   
 # Use the script with the --use-api flag
-python bitmex-wallet-parser.py --use-api 
+python bitmex-wallet-parser.py --with-api 
 ```  
    
 
@@ -63,9 +63,12 @@ python bitmex-wallet-parser.py --hide-trading  --show-affiliate --showmoney
 | `--show-affiliate` | show affiliate income |
 | `--hide-trading` | hide trading data |
 | `--showmoney` | add money values to the axis |
-| `--use-api` | get bitmex historical data via api |  
+| `--with-api` | get bitmex historical data via api |  
   
-      
+
+### Sample output    
+![Sample output ](https://i.imgur.com/k5fO7EX.png)    
+   
 # TODO 
 cache/save/check cache/refresh latest data for trading history / candles   
 

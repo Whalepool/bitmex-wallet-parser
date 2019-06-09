@@ -253,7 +253,7 @@ class BFX( Timeperiods ):
 		if start_date != None:
 			api_query_url = base_url+'&start='+str(start_date_ms)+'&sort=1'
 		
-		candles = self.api_request( api_query_url )
+		candles = self.api_request( api_query_url, skip_slow=True  )
 		cut_off = len(candles)
 
 		for i,c in enumerate(candles):
@@ -343,9 +343,9 @@ class BFX( Timeperiods ):
 		return output
 
 
-	def api_request(self, url):
+	def api_request(self, url, skip_slow=False):
 
-		if (self.api_limit_seconds > 0): 
+		if (self.api_limit_seconds > 0) and (skip_slow == False): 
 
 			logger.info('Slow api mode, sleeping for '+str(self.api_limit_seconds)+' seconds')
 			time.sleep(self.api_limit_seconds)
