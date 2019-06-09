@@ -281,8 +281,8 @@ class BFX( Timeperiods ):
 
 			candles       = candles[0:len(candles)-1] + api_candles[0:cut_off+1]
 
-			print2( 'First candle returned: '+str( datetime.utcfromtimestamp(api_candles[0][0]/1000.0) )+', '+str(api_candles[0]) )
-			print2( 'Last candle used: '+str( datetime.utcfromtimestamp(api_candles[cut_off][0]/1000.0) )+', '+str(api_candles[cut_off]) )
+			print('First candle returned: '+str( datetime.utcfromtimestamp(api_candles[0][0]/1000.0) )+', '+str(api_candles[0]) )
+			print( 'Last candle used: '+str( datetime.utcfromtimestamp(api_candles[cut_off][0]/1000.0) )+', '+str(api_candles[cut_off]) )
 
 			last_date_ms = candles[len(candles)-1][0]
 
