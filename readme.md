@@ -67,10 +67,6 @@ python bitmex-wallet-parser.py --hide-trading  --show-affiliate --showmoney
   
 
 ### Sample output    
-Terminal output  
-![Sample output ](https://i.imgur.com/k5fO7EX.png)      
-  
----   
 
 ```bash 
 python bitmex-wallet-parser.py --hide-trading  --show-affiliate -s '2018-01-01 00:00' -e '2019-01-01 00:00'
