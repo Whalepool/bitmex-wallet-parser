@@ -177,14 +177,16 @@ mask = (df['transactStatus'] != 'Canceled') & (df['transactType'] != 'Unrealised
 df = df[mask]
 
 # transactiontime to datetime
-df['transactTime'] = df['transactTime'].apply(dateutil.parser.parse)
-
+# df['transactTime'] = df['transactTime'].apply(dateutil.parser.parse)
+df['transactTime'] = pd.to_datetime(df['transactTime'], dayfirst=True)
 
 # Set it to be the index
 df.set_index(df['transactTime'], inplace=True)
 
 # Sort the df by that index
 df.sort_index(inplace=True)
+
+
 
 # Convert dates to num for matplotlib
 df['mpldate'] = df['transactTime'].map(mdates.date2num)
