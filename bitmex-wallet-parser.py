@@ -118,7 +118,7 @@ if args.with_api == True:
 		bitmex_api_secret = input("Enter you Bitmex API Secret: ")
 
 	now = datetime.now().replace(second=0, microsecond=0)
-	wallet_file  = "Wallet History  "+now.strftime('%Y-%-m-%d %H-%M')+".csv"	 
+	wallet_file  = "Wallet History  "+now.strftime('%Y-%m-%d %H-%M')+".csv"	 
 
 	client 	     = bitmex.bitmex(test=False, api_key=bitmex_api_key,api_secret=bitmex_api_secret)
 	data         = client.User.User_getWalletHistory(count=5000000).result()
