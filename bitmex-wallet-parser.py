@@ -145,9 +145,13 @@ if args.with_api == True:
 		})
 	    for x in data[0]:
 	        t = {}
+
 	        for field in fieldnames:
+
 	        	if field == 'transactTime':
-	        		t[field] = x[field].strftime('%Y-%m-%d %H:%M:%S.%f')
+	        		if x[field] is not None:
+	        			
+		        		t[field] = x[field].strftime('%Y-%m-%d %H:%M:%S.%f')
 	        	else:
 	        		t[field] = x[field] 
 
